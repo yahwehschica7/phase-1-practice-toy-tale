@@ -2,7 +2,7 @@ let addToy = false;
 
 const toyCollection = document.querySelector("#toy-collection")
 const newToyForm = document.querySelector(".add-toy-form")
-const likeBtn = document.getElementsByClassName("like-btn")
+const likeBtn = document.querySelectorAll(".like-btn")
 
 document.addEventListener("DOMContentLoaded", (e) => {
     e.preventDefault()
@@ -39,7 +39,7 @@ function createToyCard(toy) {
     <button class="like-btn" id="${toy.id}">Like</button>
   </div>
     `
-    toyCollection.innerHTML += toyCard
+    toyCollection.innerHTML += toyCard 
 }
 
 // *** All of the above works. Below is the POST***
@@ -71,25 +71,28 @@ function postNewToy(e) {
    
   
   newToyForm.addEventListener("submit", postNewToy)
-  
+  likeBtn.addEventListener("click", updateLikes)
     
-  function updateLikes() {
-    likeBtn.addEventListener("click", (e) => {
+  function updateLikes(e) {
+      console.log(e)
       if (e.target.className === "like-btn") {
-      let currentLikes = parseInt(e.target.previousSibling.innerHTML)
+      let currentLikes = parseInt(e.target.previousElementSibling.innerText)
       let newLikes = currentLikes + 1
-      e.target.previousSibling.innerHTML = newLikes + "Likes"
+      e.target.previousElementSibling.innerText = newLikes + "Likes"
       }
-    })    
+        
     fetch(`http://localhost:3000/toys/${e.target.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
          Accept: "application/json",
-      },
-      body: JSON.stringify({likes: newLikes}),
+      }, 
+        body: JSON.stringify({likes: newLikes}),
     })
+      .then(res => res.json())
+      .then(data => e.target.previousSibling.innerText = `${newLikes} Likes`)
   }
+
   
 
   
