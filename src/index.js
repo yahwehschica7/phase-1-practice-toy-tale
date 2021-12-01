@@ -2,7 +2,7 @@ let addToy = false;
 
 const toyCollection = document.querySelector("#toy-collection")
 const newToyForm = document.querySelector(".add-toy-form")
-const likeBtn = document.querySelectorAll(".like-btn")
+
 
 document.addEventListener("DOMContentLoaded", (e) => {
     e.preventDefault()
@@ -31,22 +31,33 @@ function getToys() {
 
 
 function createToyCard(toy) {
-    const toyCard = `
-    <div class="card">
-    <h2>${toy.name}</h2>
-    <img src="${toy.image}" class="toy-avatar" />
-    <p>${toy.likes} </p>
-    <button class="like-btn" id="${toy.id}">Like</button>
-  </div>
-    `
-    toyCollection.innerHTML += toyCard 
+    const toyCard = document.createElement('div')
+    toyCard.className = "card"
+
+    const toyName = document.createElement("h2")
+    toyName.innerText = toy.name 
+
+    const toyImage = document.createElement("img")
+    toyImage.src = toy.image
+    toyImage.className = "toy-avatar"
+
+    const toyLikes = document.createElement("p")
+    toyLikes.innerText = `${toy.likes}  Likes`
+
+    const likeBtn = document.createElement("button")
+    likeBtn.innerText = `Like`
+
+        
+    toyCard.append(toyName, toyImage, toyLikes, likeBtn)
+ 
+    toyCollection.append(toyCard) 
+    likeBtn.addEventListener("click", updateLikes)
 }
 
 // *** All of the above works. Below is the POST***
 
 function postNewToy(e) {
-  // e.preventDefault()
-
+  
   let newToyName = newToyForm.name.value
   let newToyUrl = newToyForm.image.value
   
@@ -65,36 +76,45 @@ function postNewToy(e) {
     })
       .then(res => res.json())
       .then(newToy => postNewToy(newToy));
-      // newToyForm.reset 
+       
     }
 
    
   
   newToyForm.addEventListener("submit", postNewToy)
-  likeBtn.addEventListener("click", updateLikes)
+  
     
   function updateLikes(e) {
-      console.log(e)
-      if (e.target.className === "like-btn") {
+      
       let currentLikes = parseInt(e.target.previousElementSibling.innerText)
       let newLikes = currentLikes + 1
       e.target.previousElementSibling.innerText = newLikes + "Likes"
-      }
+      
         
-    fetch(`http://localhost:3000/toys/${e.target.id}`, {
+    fetch("http://localhost:3000/toys/`${toy.id}`",{
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
          Accept: "application/json",
       }, 
-        body: JSON.stringify({likes: newLikes}),
+        body: JSON.stringify(newLikes)
     })
-      .then(res => res.json())
-      .then(data => e.target.previousSibling.innerText = `${newLikes} Likes`)
+      .then(res => res.json(newLikes))
+      .then(data => {
+        console.log(data)
+        createToyCard() 
+      })
   }
 
   
-
+// `
+    // <div class="card">
+    // <h2>${toy.name}</h2>
+    // <img src="${toy.image}" class="toy-avatar" />
+    // <p>${toy.likes} </p>
+    // <button class="like-btn" id="${toy.id}">Like</button>
+    // </div>
+    // ` THIS CODE WORKS
   
        
  
