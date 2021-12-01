@@ -46,12 +46,14 @@ function createToyCard(toy) {
 
     const likeBtn = document.createElement("button")
     likeBtn.innerText = `Like`
-
+    likeBtn.setAttribute("id", toy.id) 
         
     toyCard.append(toyName, toyImage, toyLikes, likeBtn)
  
     toyCollection.append(toyCard) 
-    likeBtn.addEventListener("click", updateLikes)
+    likeBtn.addEventListener("click", (e) => {
+      updateLikes(e)
+    })
 }
 
 // *** All of the above works. Below is the POST***
@@ -79,42 +81,35 @@ function postNewToy(e) {
        
     }
 
-   
-  
   newToyForm.addEventListener("submit", postNewToy)
   
-    
   function updateLikes(e) {
-      
+      console.log(e) 
       let currentLikes = parseInt(e.target.previousElementSibling.innerText)
       let newLikes = currentLikes + 1
       e.target.previousElementSibling.innerText = newLikes + "Likes"
-      
-        
-    fetch("http://localhost:3000/toys/`${toy.id}`",{
+     
+     
+    fetch(`http://localhost:3000/toys/${e.target.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
          Accept: "application/json",
       }, 
-        body: JSON.stringify(newLikes)
+        body: JSON.stringify({
+          "likes" : newLikes
+        })
     })
-      .then(res => res.json(newLikes))
+      .then(res => res.json())
       .then(data => {
+        newLikes = e.target.previousElementSibling.innerText
         console.log(data)
-        createToyCard() 
       })
   }
 
+
   
-// `
-    // <div class="card">
-    // <h2>${toy.name}</h2>
-    // <img src="${toy.image}" class="toy-avatar" />
-    // <p>${toy.likes} </p>
-    // <button class="like-btn" id="${toy.id}">Like</button>
-    // </div>
-    // ` THIS CODE WORKS
+
   
        
  
